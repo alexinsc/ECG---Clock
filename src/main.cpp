@@ -1,68 +1,61 @@
-#include <Arduino.h>
-#include <Wire.h>
-#include <Adafruit_SSD1306.h>
-#include <Adafruit_GFX.h>
-#include <RtcDS1302.h>
+/*
+Branchement :
+/!\ Attention, bien penser à alimenter l'écran OLED
+/!\ Attention, bien penser à alimenter l'horloge RTC (A minima brancher la broche GRD)
+Clock :
+  RST: D4
+  DAT: D3
+  CLK: D2
+Ecran OLED :
+  SCL : A5
+  SDA : A4  
+*/
 
+
+//Déclaration des bibliothèques
+#include <Arduino.h> //Bibliothèque Arduino
+#include <Wire.h> //Bibliothèque pour l'écran OLED et l'horloge RTC
+#include <Adafruit_SSD1306.h> //Bibliothèque pour l'écran OLED
+#include <Adafruit_GFX.h> //Bibliothèque pour l'écran OLED
+#include <RtcDS1302.h> //Bibliothèque pour l'horloge RTC
+
+//Déclaration des variables
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
-ThreeWire myWire(3,2,4);
-RtcDS1302<ThreeWire> Rtc(myWire);
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1); //Définition de l'écran OLED
+ThreeWire myWire(3,2,4); //Définition des broches de l'horloge RTC
+RtcDS1302<ThreeWire> Rtc(myWire); //Définition de l'horloge RTC
 
+//Déclaration de la boucle setup()
 void setup() {
-  Serial.begin(115600);
-  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  display.setTextSize(2);
-  display.setTextColor(WHITE);
-  Rtc.Begin();
-  RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
-  if (!Rtc.IsDateTimeValid()) 
-  {
-    // Common Causes:
-    //    1) first time you ran and the device wasn't running yet
-    //    2) the battery on the device is low or even missing
-    Serial.println("RTC lost confidence in the DateTime!");
-    Rtc.SetDateTime(compiled);
-  }
-
-  if (Rtc.GetIsWriteProtected())
-  {
-    Serial.println("RTC was write protected, enabling writing now");
-    Rtc.SetIsWriteProtected(false);
-  }
-
-  if (!Rtc.GetIsRunning())
-  {
-    Serial.println("RTC was not actively running, starting now");
-    Rtc.SetIsRunning(true);
-  }
-
-  RtcDateTime now = Rtc.GetDateTime();
-  if (now < compiled) 
-  {
-    Rtc.SetDateTime(compiled);
-  }
+  Serial.begin(9600);     //Initialisation de la communication série et taux de raffraichissement
+  display.begin(SSD1306_SWITCHCAPVCC, 0x3C);      //Initialisation de l'écran OLED
+  display.setTextSize(2);      //Définition de la taille du texte
+  display.setTextColor(WHITE);      //Définition de la couleur du texte
+  Rtc.Begin();      //Initialisation de l'horloge RTC
 }
 
+//Déclaration de la boucle loop() (instruction répétée en boucle)
 void loop() {
-    RtcDateTime now = Rtc.GetDateTime();
-    display.clearDisplay();
+    RtcDateTime now = Rtc.GetDateTime(); //Récupération de la date et de l'heure à chaque début de boucle
+    display.clearDisplay();  //Effacement de l'écran OLED
     display.setCursor(0,1);
 
+    //Affichage de la date sur l'écrna OLED
     display.println("Date: ");
-    display.print(now.Day());
+    display.print(now.Day()); //Affichage du jour
     display.print("/");
-    display.print(now.Month());
+    display.print(now.Month()); //Affichage du mois
     display.print("/");
-    display.println(now.Year());
+    display.println(now.Year()); //Affichage de l'année
 
+    //Affichage de l'heure sur l'écran OLED
     display.println("Time: ");
-    display.print(now.Hour());
+    display.print(now.Hour()); //Affichage de l'heure
     display.print(":");
-    display.print(now.Minute());
+    display.print(now.Minute()); //Affichage des minutes
     display.print(":");
-    display.print(now.Second());
-    display.display();
+    display.print(now.Second()); //Affichage des secondes
+    display.display(); //Affichage de l'écran OLED
 }
 
