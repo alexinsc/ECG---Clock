@@ -33,6 +33,7 @@ void setup() {
   display.setTextSize(2);      //Définition de la taille du texte
   display.setTextColor(WHITE);      //Définition de la couleur du texte
   Rtc.Begin();      //Initialisation de l'horloge RTC
+
 }
 
 //Déclaration de la boucle loop() (instruction répétée en boucle)
@@ -58,4 +59,3 @@ void loop() {
     display.print(now.Second()); //Affichage des secondes
     display.display(); //Affichage de l'écran OLED
 }
-
